@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">BookApp</string>
+    <string name="api_base_url">http://so-unlam.net.ar/api/api/</string>
+</resources>
