@@ -1,4 +1,4 @@
-package com.example.bookapp;
+package com.example.bookapp.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -14,10 +14,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.bookapp.userAPI.IUser;
-import com.example.bookapp.userAPI.SessionManager;
-import com.example.bookapp.userAPI.UserRequest;
-import com.example.bookapp.userAPI.UserResponse;
+import com.example.bookapp.R;
+import com.example.bookapp.interfaces.IUser;
+import com.example.bookapp.models.firebase.Firebase;
+import com.example.bookapp.models.firebase.User;
+import com.example.bookapp.models.session.SessionHandler;
+import com.example.bookapp.requests.UserEventRequest;
+import com.example.bookapp.requests.UserRequest;
+import com.example.bookapp.responses.UserEventResponse;
+import com.example.bookapp.responses.UserResponse;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import java.util.Objects;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,9 +34,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RegisterActivity extends AppCompatActivity {
     //Variables
+    //View//
     private EditText editTextName, editTextLastName, editTextDNI, editTextEmailRegister, editTextPasswordRegister, editTextCommission;
     private Button buttonRegisterRegister;
-    private SessionManager sessionManager;
+
+    //Logic//
+    private SessionHandler sessionHandler;
+    private FirebaseDatabase firebase;
+    private DatabaseReference usersDB;
+    private User user;
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -45,7 +58,10 @@ public class RegisterActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_register);
 
-        sessionManager = new SessionManager(getApplicationContext());
+        sessionHandler = new SessionHandler(getApplicationContext());
+
+        firebase = Firebase.getInstance();
+        usersDB = firebase.getReference(getString(R.string.db_users));
 
         //IDs screen elements
         editTextName = findViewById(R.id.editTextName);
@@ -84,15 +100,19 @@ public class RegisterActivity extends AppCompatActivity {
                     .build();
             IUser iUser = retrofit.create(IUser.class);
 
-            Call<UserResponse> call = iUser.registrarUsuario(request);
+            Call<UserResponse> call = iUser.registerUser(request);
             call.enqueue(new Callback<UserResponse>() {
                 @Override
                 public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                     if (response.isSuccessful()) {
-                        sessionManager.saveEmail(request.getEmail());
-                        sessionManager.saveToken(response.body().getToken());
-                        sessionManager.saveTokenRefresh(response.body().getTokenRefresh());
+                        user = new User();
+                        user.setEmail(request.getEmail());
+                        createUser(user);
+                        sessionHandler.saveEmail(request.getEmail());
+                        sessionHandler.saveToken(response.body().getToken());
+                        sessionHandler.saveTokenRefresh(response.body().getTokenRefresh());
                         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                        registerRegisterEvent();
                         startActivity(intent);
                         finish();
                     }
@@ -108,6 +128,39 @@ public class RegisterActivity extends AppCompatActivity {
             });
         }
     };
+
+    private void createUser(User user) {
+        usersDB.push().setValue(user);
+    }
+
+    private void registerRegisterEvent() {
+        UserEventRequest request = new UserEventRequest();
+        request.setEnv("PROD");
+        request.setTypeEvents("register");
+        request.setDescription("Successful register.");
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(getString(R.string.api_base_url))
+                .build();
+
+        IUser iUser = retrofit.create(IUser.class);
+
+        Call<UserEventResponse> call = iUser.registerEvent("Bearer " + sessionHandler.getToken(), request);
+        call.enqueue(new Callback<UserEventResponse>() {
+            @Override
+            public void onResponse(Call<UserEventResponse> call, Response<UserEventResponse> response) {
+                if(!response.isSuccessful()) {
+                    Toast.makeText(RegisterActivity.this, "Wrong data.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<UserEventResponse> call, Throwable t) {
+                Toast.makeText(RegisterActivity.this, "Register register event failed.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private boolean existInternetConnection() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

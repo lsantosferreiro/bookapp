@@ -1,4 +1,4 @@
-package com.example.bookapp.userAPI;
+package com.example.bookapp.requests;
 
 import com.google.gson.annotations.SerializedName;
 

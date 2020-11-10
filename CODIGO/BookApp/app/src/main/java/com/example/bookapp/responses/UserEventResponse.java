@@ -1,4 +1,6 @@
-package com.example.bookapp.userAPI;
+package com.example.bookapp.responses;
+
+import com.example.bookapp.models.userEventsAPI.Event;
 
 public class UserEventResponse {
     //Variables

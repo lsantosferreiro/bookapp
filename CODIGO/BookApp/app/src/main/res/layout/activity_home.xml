@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".MainActivity">
+    tools:context=".activities.HomeActivity">
 
     <ImageView
         android:id="@+id/imageViewTitleHome"
@@ -32,7 +32,20 @@
         app:layout_constraintVertical_bias="0.238" />
 
     <Button
-        android:id="@+id/buttonExplore"
+        android:id="@+id/buttonSensors"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sensors"
+        app:backgroundTint="#000F4E"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.346" />
+
+    <Button
+        android:id="@+id/buttonExploreHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Explore"
@@ -45,10 +58,10 @@
         app:layout_constraintVertical_bias="0.89" />
 
     <Button
-        android:id="@+id/buttonWishList"
+        android:id="@+id/buttonReadingsHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="WishList"
+        android:text="Readings"
         app:backgroundTint="#000F4E"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,7 +73,7 @@
         android:id="@+id/textViewEmailHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="_user"
+        android:text="USER"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"

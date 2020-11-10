@@ -1,4 +1,4 @@
-package com.example.bookapp.userAPI;
+package com.example.bookapp.responses;
 
 public class UserResponse {
     //Variables

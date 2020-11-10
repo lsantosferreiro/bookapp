@@ -1,25 +1,13 @@
-package com.example.bookapp.userAPI;
+package com.example.bookapp.models.userEventsAPI;
 
-import com.google.gson.annotations.SerializedName;
-
-public class EventRequest {
+public class Event {
     //Variables
-    @SerializedName("env")
-    private String env;
-    @SerializedName("type_events")
     private String typeEvents;
-    @SerializedName("description")
+    private long dni;
     private String description;
+    private long id;
 
     //Getters and setters
-    public String getEnv() {
-        return env;
-    }
-
-    public void setEnv(String env) {
-        this.env = env;
-    }
-
     public String getTypeEvents() {
         return typeEvents;
     }
@@ -28,11 +16,27 @@ public class EventRequest {
         this.typeEvents = typeEvents;
     }
 
+    public long getDni() {
+        return dni;
+    }
+
+    public void setDni(long dni) {
+        this.dni = dni;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

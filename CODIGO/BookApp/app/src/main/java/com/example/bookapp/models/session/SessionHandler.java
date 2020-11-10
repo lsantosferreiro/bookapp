@@ -1,4 +1,4 @@
-package com.example.bookapp.userAPI;
+package com.example.bookapp.models.session;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,39 +8,27 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.Date;
 import com.example.bookapp.R;
+import com.example.bookapp.responses.UserResponse;
+import com.example.bookapp.interfaces.IUser;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class SessionManager {
+public class SessionHandler {
     //Variables
     private Context context;
     private SharedPreferences preferences;
 
     //Constructor
-    public SessionManager(Context context){
+    public SessionHandler(Context context){
         this.context = context;
         preferences = context.getSharedPreferences("data", Context.MODE_PRIVATE);
     }
 
     //Functions
-    public boolean isTokenAlive() throws ParseException {
-        String tokenHour = getTokenHour();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        Date tokenHourFormatted = formatter.parse(tokenHour);
-        Date now = Calendar.getInstance().getTime();
-
-        long millis = now.getTime() - tokenHourFormatted.getTime();
-        long minutes = (millis/(1000*60)) % 60;
-
-        if(minutes < 30)
-            return true;
-        else
-            return false;
-    }
-
     public void refreshToken(){
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
@@ -73,18 +61,33 @@ public class SessionManager {
         });
     }
 
-    public void saveToken(String token) {
-        SharedPreferences.Editor editor = preferences.edit();
-
-        Date tokenHour = Calendar.getInstance().getTime();
+    public boolean isTokenAlive() throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String tokenHourFormatted = formatter.format(tokenHour);
+        String tokenHour = getTokenHour();
+        Date tokenHourFormatted = formatter.parse(tokenHour);
+        Date now = Calendar.getInstance().getTime();
 
+        long millis = now.getTime() - tokenHourFormatted.getTime();
+        long minutes = (millis/(1000*60)) % 60;
+
+        if(minutes < 30)
+            return true;
+        else
+            return false;
+    }
+
+    //Save token in shared preferences
+    public void saveToken(String token) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        SharedPreferences.Editor editor = preferences.edit();
+        Date tokenHour = Calendar.getInstance().getTime();
+        String tokenHourFormatted = formatter.format(tokenHour);
         editor.putString("hour_token", tokenHourFormatted);
         editor.putString("token", token);
         editor.commit();
     }
 
+    //Save token refresh in shared preferences
     public void saveTokenRefresh(String tokenRefresh) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("token_refresh", tokenRefresh);
